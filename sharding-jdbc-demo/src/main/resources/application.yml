@@ -1,0 +1,40 @@
+spring:
+   main:
+      allow-bean-definition-overriding: true #允许Bean重复注入，后者覆盖前者
+sharding:
+   jdbc:
+      datasource:
+         names: db0,db1,db2
+         db0:
+            type: com.zaxxer.hikari.HikariDataSource
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            jdbc-url: jdbc:mysql://localhost:3306/db0?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+            username: root
+            password: root
+         db1:
+            type: com.zaxxer.hikari.HikariDataSource
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            jdbc-url: jdbc:mysql://localhost:3306/db1?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+            username: root
+            password: root
+         db2:
+            type: com.zaxxer.hikari.HikariDataSource
+            driver-class-name: com.mysql.cj.jdbc.Driver
+            jdbc-url: jdbc:mysql://localhost:3306/db2?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+            username: root
+            password: root
+      config:
+         props:
+            sql.show: true #打印sql
+         sharding:
+            default-database-strategy: #默认分库策略
+               inline:
+                  sharding-column: id
+                  algorithm-expression: db$->{id % 3}
+            tables:
+               t_user:
+                  actual-data-nodes: db$->{0..2}.t_user_$->{0..2} #实际节点
+                  table-strategy: #分表策略
+                     inline:
+                        sharding-column: org_code
+                        algorithm-expression: t_user_$->{org_code % 3}
