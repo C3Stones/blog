@@ -1,5 +1,14 @@
 # Compiled class file
 *.class
+/target/
+/logs/
+
+# Setting
+/.settings/
+.classpath
+.factorypath
+.project
+.gitignore
 
 # Log file
 *.log
