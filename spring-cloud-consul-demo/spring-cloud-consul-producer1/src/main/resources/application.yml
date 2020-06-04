@@ -1,0 +1,12 @@
+server:
+  port: 9001
+
+spring:
+  application:
+    name: spring-cloud-consul-producer
+  cloud:
+    consul:
+      discovery:
+        serviceName: consul-producer
+      host: 127.0.0.1
+      port: 8500

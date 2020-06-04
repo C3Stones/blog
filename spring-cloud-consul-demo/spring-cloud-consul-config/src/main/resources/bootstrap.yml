@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: spring-cloud-consul-config
+  cloud:
+    consul:
+      discovery:
+        service-name: consul-config
+      host: 127.0.0.1
+      port: 8500
+      config:
+        # 是否启用配置中心功能
+        enabled: true
+        # 设置配置所在目录
+        prefix: config
+        # 设置应用程序使用的文件夹名称，默认application
+        defaultContext: application
+        # 配置key的名字，由于Consul是K/V存储，配置存储在对应K的V中，配置文件路径为：/config/application/key
+        data-key: data
+        # 设置配置值的格式，四种配置：YAML PROPERTIES KEY-VALUE FILES
+        format: YAML
+        # 设置配置的分隔符
+        profile-separator: ','

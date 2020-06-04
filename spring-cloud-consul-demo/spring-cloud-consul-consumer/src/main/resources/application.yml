@@ -1,0 +1,12 @@
+server:
+  port: 9003
+
+spring:
+  application:
+    name: spring-cloud-consul-consumer
+  cloud:
+    consul:
+      discovery:
+        register: false
+      host: 127.0.0.1
+      port: 8500
