@@ -1,0 +1,16 @@
+server:
+   port: ${PORT:8080}
+   
+spring:
+   redis:
+      database: 0
+      host: 10.100.66.46
+      port: 6379
+      password: 123456
+      jedis:
+         pool:
+            max-active: 8
+            max-wait: -1
+            max-idle: 8
+            min-idle: 0
+      timeout: 10000
