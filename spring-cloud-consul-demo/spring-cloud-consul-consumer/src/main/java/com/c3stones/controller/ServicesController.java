@@ -32,7 +32,7 @@ public class ServicesController {
 	 */
 	@RequestMapping(value = "/getAllServices")
 	public List<ServiceInstance> getAllServices() {
-		return discoveryClient.getInstances("service-producer");
+		return discoveryClient.getInstances("consul-producer");
 	}
 
 	/**
@@ -42,7 +42,7 @@ public class ServicesController {
 	 */
 	@RequestMapping("/getServiceUri")
 	public String getServiceUri() {
-		return loadBalancerClient.choose("service-producer").getUri().toString();
+		return loadBalancerClient.choose("consul-producer").getUri().toString();
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class ServicesController {
 	 */
 	@RequestMapping("/loadBalancer")
 	public String call() {
-		ServiceInstance serviceInstance = loadBalancerClient.choose("service-producer");
+		ServiceInstance serviceInstance = loadBalancerClient.choose("consul-producer");
 		return new RestTemplate().getForObject(serviceInstance.getUri().toString() + "/get", String.class);
 	}
 }
