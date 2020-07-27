@@ -1,0 +1,20 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.c3stones</groupId>
+	<artifactId>spring-boot-rabbitmq-demo</artifactId>
+	<packaging>pom</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<modules>
+		<module>direct-exchange-provider-demo</module>
+		<module>direct-exchange-consumer-demo</module>
+		<module>direct-exchange-provider-confirm-demo</module>
+		<module>direct-exchange-consumer-confirm-demo</module>
+		<module>fanout-exchange-provider-demo</module>
+		<module>fanout-exchange-consumer-demo</module>
+		<module>topic-exchange-provider-demo</module>
+		<module>topic-exchange-consumer-demo</module>
+	</modules>
+</project>
