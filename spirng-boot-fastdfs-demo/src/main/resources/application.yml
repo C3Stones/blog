@@ -1,0 +1,13 @@
+#fastdfs 配置
+fdfs:
+  # 读取时间
+  so-timeout: 1500
+  # 连接超时时间
+  connect-timeout: 600
+  # 缩略图
+  thumb-image:
+    width: 150
+    height: 150
+  # Tracker服务
+  tracker-list:
+    - 192.168.0.100:22122
