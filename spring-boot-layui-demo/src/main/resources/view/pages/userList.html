@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+    <link th:href="@{/layui/css/view.css}" rel="stylesheet" />
+    <script th:src="@{/layui/layui.all.js}"></script>
+    <script th:src="@{/jquery/jquery-2.1.4.min.js}"></script>
+    <title></title>
+</head>
+<body class="layui-view-body">
+	<div class="layui-content">
+	    <div class="layui-row">
+			<div class="layui-card">
+                <div class="layui-card-header">
+                	<i class="layui-icon mr5">&#xe66f;</i>用户管理
+                	<button class="layui-btn layui-btn-xs layui-btn-normal pull-right mt10" data-type="add"><i class="layui-icon mr5">&#xe654;</i>新增</button>	
+                </div>
+                <div class="layui-card-body">
+                	<div class="searchTable">
+					 用户ID：
+					 <div class="layui-inline mr5">
+					 	<input class="layui-input" name="id" autocomplete="off">
+					 </div>
+					 用户名称：
+					 <div class="layui-inline mr5">
+					 	<input class="layui-input" name="username" autocomplete="off">
+					 </div>
+					 用户昵称：
+					 <div class="layui-inline mr10">
+					 	<input class="layui-input" name="nickname" autocomplete="off">
+					 </div>
+					 <button class="layui-btn" data-type="reload">查询</button>
+					 <button class="layui-btn layui-btn-primary" data-type="reset">重置</button>
+					</div>
+                	<table class="layui-hide" id="userDataTable" lay-filter="config"></table>
+					<script type="text/html" id="operation">
+						<a class="layui-btn layui-btn-xs" lay-event="edit">修改</a>
+						<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+					</script>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+var element = layui.element;
+var table = layui.table;
+var layer = layui.layer;
+table.render({
+	id: 'userTable'
+	,elem: '#userDataTable'
+    ,url: '[[@{/user/listData}]]'
+   	,page: {
+  		layout: ['prev', 'page', 'next', 'count', 'skip', 'limit']
+  	    ,groups: 5
+  	    ,first: false
+  	    ,last: false
+	}
+    ,cols: [
+    	[
+	      {field:'id', width: 50, title: 'ID'}
+	      ,{field:'username', title: '用户名称', align: 'center'}
+	      ,{field:'nickname', title: '用户昵称', align: 'center'}
+	      ,{title:'操作', align: 'center', toolbar: '#operation', width:150}
+    	]
+   	]
+    ,response: {
+        statusCode: 200
+    }
+    ,parseData: function(res){
+    	return {
+    		"code": res.code
+            ,"msg": res.msg
+            ,"count": res.data.total
+            ,"data": res.data.records
+    	};
+    }
+});
+
+active = {
+	add: function() {
+		layer.open({
+    		type: 2,
+    		area: ['80%', '80%'],
+    		title: '新增',
+    		content: '[[@{/}]]user/add'
+    	});
+	},
+	reload: function() {
+		table.reload('userTable', {
+			page: {
+				curr: 1
+			}
+			,where: {
+				id : $("input[name='id']").val()
+				,username : $("input[name='username']").val()
+				,nickname : $("input[name='nickname']").val()
+			}
+		}, 'data');
+	},
+	reset: function() {
+		$(".layui-input").val("");
+	}
+};
+
+// 按钮事件
+$('.layui-btn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+});
+
+//监听行工具事件
+table.on('tool(config)', function(obj){
+	var row = obj.data;
+	if(obj.event === 'del') {
+		layer.confirm("确认删除吗？", {icon: 3, title:'提示'}, function(index) {
+			layer.close(index);
+			$.ajax({
+		        url : "[[@{/}]]user/delete",
+		        data : {'id': row.id},
+		        type : "post",
+		        dataType : "json",
+		        error : function(data) {
+		        	errorHandle(data);
+		        },
+		        success : function(data) {
+		        	$(".searchTable .layui-btn").eq(0).click();
+		        }
+		    });
+		});
+    } else if (obj.event === 'edit') {
+    	layer.open({
+    		type: 2,
+    		area: ['80%', '80%'],
+    		title: '修改',
+    		content: '[[@{/}]]user/edit?id=' + row.id
+    	});
+    }
+});
+
+//错误处理
+function errorHandle(data) {
+	if (data.status == 404) {
+		layer.msg("请求资源不存在", {icon: 2});
+	} else {
+		layer.msg("服务端异常", {icon: 2});
+	}
+	return;
+}
+</script>
+</html>
