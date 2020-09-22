@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+    <link th:href="@{/layui/css/view.css}" rel="stylesheet" />
+    <script th:src="@{/layui/layui.all.js}"></script>
+    <script th:src="@{/jquery/jquery-2.1.4.min.js}"></script>
+    <script th:src="@{/jquery/jquery-form.js}"></script>
+    <title></title>
+</head>
+<body class="layui-view-body">
+	<div class="layui-row">
+    	<div class="layui-card">
+        	<form class="layui-form layui-card-body layui-form-pane" method="post" th:action="@{/user/save}">
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i>*</i>用户名称</label>
+					<div class="layui-input-block">
+						<input type="text" name="username" lay-verify="username" placeholder="6-8位英文字母" maxlength="8" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i>*</i>用户昵称</label>
+					<div class="layui-input-block">
+						<input type="text" name="nickname" lay-verify="required" maxlength="15" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+    				<label class="layui-form-label"><i>*</i>用户密码</label>
+					<div class="layui-input-inline">
+						<input type="password" name="password" required lay-verify="password" maxlength="8" autocomplete="off" class="layui-input">
+	    			</div>
+					<div class="layui-form-mid layui-word-aux">请输入6-8位密码，且只能包含字母或数字</div>
+  				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i>*</i>确认密码</label>
+					<div class="layui-input-inline">
+						<input type="password" name="confirmPwd" lay-verify="confirm" maxlength="8" autocomplete="off" class="layui-input">
+	    			</div>
+				</div>
+				<div class="layui-form-item">
+	                <button type="submit" class="layui-btn" lay-submit lay-filter="*">提交</button>
+	                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+              	</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+var form = layui.form;
+var layer = layui.layer;
+
+// 自定义检验
+form.verify({
+	username: function(val) {
+		if (isEmpty(val)) {
+			return '必填项不能为空';
+		}
+		debugger;
+		var reg = /^[A-Za-z]{6,8}$/;
+		if (!reg.test(val)) {
+			return '用户名称不合法';
+		}
+		if (!checkUsername(val)) {
+			return '用户名称已存在';
+		}
+	},
+	password: [
+		/^[A-Za-z0-9]{6,8}$/
+	    ,'请输入6-8位密码，且只能包含字母或数字'
+	],
+	confirm: function(val) {
+		if (isEmpty(val)) {
+			return '必填项不能为空';
+		}
+		if (val != $("input[name='password']").val()) {
+			return '确认密码与用户密码不一致';
+		}
+	}
+});
+
+// 检测用户名称是否唯一
+function checkUsername(username) {
+	var checkResult = true;
+	$.ajax({
+        url : "[[@{/}]]user/check",
+        data : {'username': username},
+        type : "post",
+        dataType : "json",
+        async: false,
+        error : function(data) {
+        	errorHandle(data);
+        },
+        success : function(data) {
+        	checkResult =  data.data;
+        }
+    });
+	return checkResult;
+}
+
+// 提交表单
+form.on('submit(*)', function(data){
+	$(".layui-form").ajaxForm({
+		error: function(data){
+			errorHandle(data);
+		},
+		success: function(data) {
+			parent.location.reload();
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		}
+	});
+});
+
+//是否为空
+function isEmpty(n) {
+	if (n == null || n == '' || typeof(n) == 'undefined') {
+		return true;
+	}
+	return false;
+}
+
+// 错误处理
+function errorHandle(data) {
+	if (data.status == 404) {
+		layer.msg("请求资源不存在", {icon: 2});
+	} else {
+		layer.msg("服务端异常", {icon: 2});
+	}
+	return;
+}
+</script>
+</html>

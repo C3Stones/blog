@@ -1,0 +1,97 @@
+server:
+  port: 8443
+  servlet:
+    session:
+      timeout: 1800s
+  
+spring:
+  datasource:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/layuidemo?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+      username: root
+      password: 123456
+#  redis:
+#    host: 127.0.0.1
+#    port: 6379
+#    password: 123456
+#    # 连接超时时间（记得添加单位，Duration）
+#    timeout: 2000ms
+#    # Redis默认情况下有16个分片，这里配置具体使用的分片
+#    database: 0
+#    lettuce:
+#      pool:
+#        # 连接池最大连接数（使用负值表示没有限制） 默认 8
+#        maxActive: 8
+#        # 连接池中的最大空闲连接 默认 8
+#        maxIdle: 8
+  thymeleaf:
+    prefix: classpath:/view/
+    suffix: .html
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    # 生产环境设置true
+    cache: false  
+
+# Mybatis-plus配置
+mybatis-plus:
+   mapper-locations: classpath:mapper/*.xml
+   global-config:
+      db-config:
+         id-type: AUTO
+   configuration:
+      # 打印sql
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置          
+logging:
+  level:
+    com.xkcoding: debug
+    
+# 第三方系统认证
+justauth:
+  enabled: true
+  type:
+    BAIDU:
+      client-id: xxxxxx
+      client-secret: xxxxxx
+      redirect-uri: http://127.0.0.1:8443/oauth/baidu/callback
+    GITEE:
+      client-id: xxxxxx
+      client-secret: xxxxxx
+      redirect-uri: http://127.0.0.1:8443/oauth/gitee/callback
+  cache:
+    # 缓存类型（default-使用JustAuth内置的缓存、redis-使用Redis缓存、custom-自定义缓存）
+    type: default
+    # 缓存前缀，目前只对redis缓存生效，默认 JUSTAUTH::STATE::
+    prefix: 'JUATAUTH::STATE::'
+    # 超时时长，目前只对redis缓存生效，默认3分钟
+    timeout: 3m
+      
+# 信息安全
+security:
+  web:
+    excludes:
+      - /login
+      - /logout
+      - /oauth/**
+      - /images/**
+      - /jquery/**
+      - /layui/**
+  xss:
+    enable: true
+    excludes:
+      - /login
+      - /logout
+      - /images/*
+      - /jquery/*
+      - /layui/*
+  sql:
+    enable: true
+    excludes:
+      - /images/*
+      - /jquery/*
+      - /layui/*
+  csrf:
+    enable: true
+    excludes:
