@@ -32,6 +32,6 @@ public class SysRoleAuth implements Serializable {
 	/**
 	 * 权限ID
 	 */
-	private Long menuId;
+	private Long authId;
 
 }
