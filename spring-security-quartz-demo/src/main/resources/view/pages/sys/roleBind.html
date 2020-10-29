@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+    <link th:href="@{/layui/css/view.css}" rel="stylesheet" />
+    <script th:src="@{/layui/layui.all.js}"></script>
+    <script th:src="@{/jquery/jquery-2.1.4.min.js}"></script>
+    <script th:src="@{/layui/js/view.js}"></script>
+    <title></title>
+</head>
+<body class="layui-view-body">
+    <div class="layui-row">
+		<div class="layui-card">
+               <div class="layui-card-body">
+               	<div class="searchTable">
+					用户名称：
+					<div class="layui-inline mr5">
+						<input class="layui-input" name="username" autocomplete="off">
+					</div>
+					用户昵称：
+					<div class="layui-inline mr10">
+						<input class="layui-input" name="nickname" autocomplete="off">
+					</div>
+					<button class="layui-btn" data-type="reload">查询</button>
+					<button class="layui-btn layui-btn-primary" data-type="reset">重置</button>
+					<button class="layui-btn layui-btn-normal" data-type="add">添加用户</button>
+				</div>
+               	<table class="layui-hide" id="userDataTable" lay-filter="config"></table>
+				<script type="text/html" id="operation">
+						<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="remove">取消</a>
+					</script>
+               </div>
+           </div>
+       </div>
+</body>
+<script>
+var table = layui.table;
+var layer = layui.layer;
+table.render({
+	id: 'userTable'
+	,elem: '#userDataTable'
+    ,url: '[[@{/}]]role/userListData?roleId=[[${role?.id}]]'
+   	,page: {
+  		layout: ['prev', 'page', 'next', 'count', 'skip', 'limit']
+  	    ,groups: 5
+  	    ,first: false
+  	    ,last: false
+	}
+    ,cols: [
+    	[
+	      {field:'id', width: 50, title: 'ID'}
+	      ,{field:'username', title: '用户名称', align: 'center'}
+	      ,{field:'nickname', title: '用户昵称', align: 'center'}
+	      ,{title:'操作', align: 'center', toolbar: '#operation', width:100}
+    	]
+   	]
+    ,response: {
+        statusCode: 200
+    }
+    ,parseData: function(res){
+    	return {
+    		"code": res.code
+            ,"msg": res.msg
+            ,"count": res.data.total
+            ,"data": res.data.records
+    	};
+    }
+});
+
+active = {
+	add: function() {
+		layer.open({
+    		type: 2,
+    		maxmin: true,
+    		area: ['60%', '85%'],
+    		title: '添加用户',
+    		content: '[[@{/}]]role/addUser?id=[[${role?.id}]]',
+    		btn: ['提交', '关闭'],
+    		btn1: function(index, layero) {
+    			var contentWindow = layero.find('iframe')[0].contentWindow;
+    			var transferDataJson = contentWindow.transfer.getData('addUser');
+    			$.ajax({
+    		        url : "[[@{/}]]role/saveUserRole",
+    		        data : {'roleId' : '[[${role?.id}]]', 'dataJson' : JSON.stringify(transferDataJson)},
+    		        type : "post",
+    		        dataType : "json",
+    		        error : function(data) {
+    		        	errorHandle(data);
+    		        },
+    		        success : function(data) {
+    		        	msg(data);
+    		        	if (data.code == 200) {
+    		        		refresh();
+    		        		layer.close(index);
+    		        	}
+    		        }
+    			});
+    		},
+			btn2: function(index, layero) {
+				layer.close(index);
+    		}
+    	});
+	},
+	reload: function() {
+		table.reload('userTable', {
+			page: {
+				curr: 1
+			}
+			,where: {
+				username : $("input[name='username']").val()
+				,nickname : $("input[name='nickname']").val()
+			}
+		}, 'data');
+	},
+	reset: function() {
+		$(".searchTable .layui-input").val("");
+	}
+};
+
+// 按钮事件
+$('.layui-btn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+});
+
+//监听行工具事件
+table.on('tool(config)', function(obj){
+	var row = obj.data;
+	if(obj.event === 'remove') {
+		layer.confirm("确认取消吗？", {icon: 3, title:'提示'}, function(index) {
+			layer.close(index);
+			$.ajax({
+		        url : "[[@{/}]]role/remove",
+		        data : {'roleId': '[[${role?.id}]]', 'userId': row.id},
+		        type : "post",
+		        dataType : "json",
+		        error : function(data) {
+		        	errorHandle(data);
+		        },
+		        success : function(data) {
+		        	$(".searchTable .layui-btn").eq(0).click();
+		        }
+		    });
+		});
+    }
+});
+</script>
+</html>

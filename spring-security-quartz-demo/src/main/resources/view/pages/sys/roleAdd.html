@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+    <link th:href="@{/layui/css/view.css}" rel="stylesheet" />
+    <script th:src="@{/layui/layui.all.js}"></script>
+    <script th:src="@{/jquery/jquery-2.1.4.min.js}"></script>
+    <script th:src="@{/jquery/jquery-form.js}"></script>
+    <script th:src="@{/layui/js/view.js}"></script>
+    <title></title>
+</head>
+<body class="layui-view-body">
+	<div class="layui-row">
+    	<div class="layui-card">
+        	<form class="layui-form layui-card-body layui-form-pane" method="post" th:action="@{/role/save}">
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i>*</i>角色名称</label>
+					<div class="layui-input-block">
+						<input type="text" name="roleName" lay-verify="required" maxlength="50" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i>*</i>角色编码</label>
+					<div class="layui-input-block">
+						<input type="text" name="roleCode" lay-verify="roleCode" placeholder="大小写英文字母" maxlength="50" autocomplete="off" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+	                <button type="submit" class="layui-btn" lay-submit lay-filter="*">提交</button>
+	                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+              	</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+var form = layui.form;
+var layer = layui.layer;
+
+// 自定义检验
+form.verify({
+	roleCode: function(val) {
+		if (isEmpty(val)) {
+			return '必填项不能为空';
+		}
+		var reg = /^[A-Za-z]{1,50}$/;
+		if (!reg.test(val)) {
+			return '角色编码不合法';
+		}
+		if (!checkRoleCode(val)) {
+			return '角色编码已存在';
+		}
+	}
+});
+
+// 检测角色编码是否唯一
+function checkRoleCode(roleCode) {
+	var checkResult = true;
+	$.ajax({
+        url : "[[@{/}]]role/check",
+        data : {'roleCode': roleCode},
+        type : "post",
+        dataType : "json",
+        async: false,
+        error : function(data) {
+        	errorHandle(data);
+        },
+        success : function(data) {
+        	checkResult =  data.data;
+        }
+    });
+	return checkResult;
+}
+
+// 提交表单
+form.on('submit(*)', function(data){
+	$(".layui-form").ajaxForm({
+		error: function(data){
+			errorHandle(data);
+		},
+		success: function(data) {
+			parent.location.reload();
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		}
+	});
+});
+</script>
+</html>

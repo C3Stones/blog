@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>C3Stones</title>
+    <link th:href="@{/images/favicon.ico}" rel="icon">
+	<link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+	<link th:href="@{/layui/css/login.css}" rel="stylesheet" />
+	<link th:href="@{/layui/css/view.css}" rel="stylesheet" />
+	<script th:src="@{/layui/layui.all.js}"></script>
+	<script th:src="@{/jquery/jquery-2.1.4.min.js}"></script>
+	<script th:src="@{/layui/js/view.js}"></script>
+</head>
+<body class="login-wrap">
+    <div class="login-container">
+        <form class="login-form">
+        	<div class="input-group text-center text-gray">
+        		<h2>欢迎登录</h2>
+        	</div>
+            <div class="input-group">
+                <input type="text" id="username" class="input-field">
+                <label for="username" class="input-label">
+                    <span class="label-title">用户名</span>
+                </label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" class="input-field">
+                <label for="password" class="input-label">
+                    <span class="label-title">密码</span>
+                </label>
+            </div>
+            <button type="button" class="login-button">登录<i class="ai ai-enter"></i></button>
+        </form>
+    </div>
+</body>
+</html>
+<script>
+layui.define(['element'],function(exports){
+    var $ = layui.$;
+    $('.input-field').on('change',function(){
+        var $this = $(this),
+            value = $.trim($this.val()),
+            $parent = $this.parent();
+        if(!isEmpty(value)){
+            $parent.addClass('field-focus');
+        }else{
+            $parent.removeClass('field-focus');
+        }
+    })
+    exports('login');
+});
+
+// 登录
+var layer = layui.layer;
+$(".login-button").click(function() {
+	var username = $("#username").val();
+	var password = $("#password").val();
+	if (isEmpty(username) || isEmpty(password)) {
+		layer.msg("用户名或密码不能为空", {icon: 2});
+		return ;
+	}
+	
+	var loading = layer.load(1, {shade: [0.3, '#fff']});
+	$.ajax({
+        url : "[[@{/}]]login",
+        data : {username : username, password : password},
+        type : "post",
+        dataType : "json",
+        error : function(data) {
+        	layer.close(loading);
+        	errorHandle(data);
+        },
+        success : function(data) {
+        	layer.close(loading);
+        	if (data.code == 200) {
+        		location.href = "[[@{/}]]index";
+        	} else {
+        		layer.msg(data.data, {icon: 2});
+        	}
+        }
+	});
+});
+</script>

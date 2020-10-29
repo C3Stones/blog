@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+    <link th:href="@{/layui/css/view.css}" rel="stylesheet" />
+    <script th:src="@{/layui/layui.all.js}"></script>
+    <script th:src="@{/jquery/jquery-2.1.4.min.js}"></script>
+    <script th:src="@{/jquery/jquery-form.js}"></script>
+    <script th:src="@{/layui/js/view.js}"></script>
+   	<script th:src="@{/layui/lay/modules/transfer.js}"></script>
+    <link th:href="@{/layui/css/transfer.css}" rel="stylesheet" />
+    <title></title>
+</head>
+<body class="layui-view-body">
+	<div class="layui-row">
+    	<div class="layui-card pt10 pb10">
+    		<div id="addRole"></div>
+    	</div>
+    </div>
+</body>
+<style>
+#addRole {
+	display: flex;
+	justify-content: center;
+	overflow: hidden;
+}
+</style>
+<script>
+var transfer = layui.transfer;
+var layer = layui.layer;
+
+$(function() {
+	$.ajax({
+        url : "[[@{/}]]auth/getRoleAuthData",
+        data : {'id' : '[[${auth?.id}]]'},
+        type : "post",
+        dataType : "json",
+        error : function(data) {
+        	errorHandle(data);
+        },
+        success : function(data) {
+        	if (data.code == 200) {
+        		var dataArr = data.data.roleAllList;
+        		var valueArr = data.data.selectedList;
+        		// 初始化穿梭框
+            	transfer.render({
+            		id: 'addRole',
+            	    elem: '#addRole',
+           	    	parseData: function(res){
+           	    		return {
+           	    	    	"value": res.id
+           	    	        ,"title": res.roleName
+           	    		}
+           	    	},
+            	    data: dataArr,
+            	    value: valueArr,
+            	   	title: ['未选择', '已选择'],
+            	    showSearch: true,
+            	    width: 250
+            	});
+        	}
+        }
+    });
+});
+</script>

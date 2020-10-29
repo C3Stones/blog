@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+    <link th:href="@{/layui/css/view.css}" rel="stylesheet" />
+    <script th:src="@{/layui/layui.all.js}"></script>
+    <script th:src="@{/jquery/jquery-2.1.4.min.js}"></script>
+    <script th:src="@{/layui/js/view.js}"></script>
+    <title></title>
+</head>
+<body class="layui-view-body">
+	<div class="layui-content">
+	    <div class="layui-row">
+			<div class="layui-card">
+                <div class="layui-card-header">
+                	<i class="layui-icon mr5">&#xe66f;</i>任务调度（定时器状态：<label id="schedulerStatus"></label>）
+                	<button class="layui-btn layui-btn-xs layui-hide" data-type="startScheduler">启动定时器</button>
+					<button class="layui-btn layui-btn-xs layui-btn-danger layui-hide" data-type="standbyScheduler">定时器待机</button>
+                	<button class="layui-btn layui-btn-xs layui-btn-normal pull-right mt10" data-type="add"><i class="layui-icon mr5">&#xe654;</i>新增</button>	
+                </div>
+                <div class="layui-card-body">
+                	<div class="searchTable">
+					 任务名称：
+					 <div class="layui-inline mr5">
+					 	<input class="layui-input" name="jobName" autocomplete="off">
+					 </div>
+					 <button class="layui-btn" data-type="reload">查询</button>
+					 <button class="layui-btn layui-btn-primary" data-type="reset">重置</button>
+					</div>
+                	<table class="layui-hide" id="jobDataTable" lay-filter="config"></table>
+					<script type="text/html" id="operation">
+						<a class="layui-btn layui-btn-xs " lay-event="start">启动</a>
+						<a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="pasue">暂停</a>
+						<a class="layui-btn layui-btn-xs layui-btn-normal" lay-event="trigger">立即执行</a>
+						<a class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+					</script>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+var table = layui.table;
+var layer = layui.layer;
+table.render({
+	id: 'jobTable'
+	,elem: '#jobDataTable'
+    ,url: '[[@{/job/listData}]]'
+    ,cellMinWidth: 100
+   	,page: {
+  		layout: ['prev', 'page', 'next', 'count', 'skip', 'limit']
+  	    ,groups: 5
+  	    ,first: false
+  	    ,last: false
+	}
+    ,cols: [
+    	[
+	      {field:'id', title: 'ID', width: 50}
+	      ,{field:'jobName', title: '任务名称', width: 120}
+	      ,{field:'cronExpression', title: '周期表达式', edit: 'text', width: 100}
+	      ,{field:'beanClass', title: '任务执行类', width: 250}
+	      ,{field:'jobDataMap', title: '参数', width: 200}
+	      ,{field:'status', title: '状态', templet: '#statusTemp', width: 80, align: 'center'}
+	      ,{field:'jobGroup', title: '分组', templet: '#groupTemp', width: 60, align: 'center'}
+	      ,{field:'nextfireDate', title: '下一次执行时间', width: 160, align: 'center'}
+	      ,{field:'remarks', title: '描述', width: 200}
+	      ,{fixed: 'right', title:'操作', align: 'center', toolbar: '#operation', width:240}
+    	]
+   	]
+    ,response: {
+        statusCode: 200
+    }
+    ,parseData: function(res){
+    	return {
+    		"code": res.code
+            ,"msg": res.msg
+            ,"count": res.data.total
+            ,"data": res.data.records
+    	};
+    }
+});
+
+active = {
+	add: function() {
+		layer.open({
+    		type: 2,
+    		maxmin: true,
+    		area: ['90%', '90%'],
+    		title: '新增',
+    		content: '[[@{/}]]job/add'
+    	});
+	},
+	reload: function() {
+		table.reload('jobTable', {
+			page: {
+				curr: 1
+			}
+			,where: {
+				jobName : $("input[name='jobName']").val()
+			}
+		}, 'data');
+	},
+	reset: function() {
+		$(".searchTable .layui-input").val("");
+	},
+	startScheduler: function() {
+		$.ajax({
+	        url : "[[@{/}]]job/startScheduler",
+	        data : {},
+	        type : "post",
+	        dataType : "json",
+	        error : function(data) {
+	        	errorHandle(data);
+	        },
+	        success : function(data) {
+	        	getSchedulerStatus();
+	        	msg(data);
+	        	refresh();
+	        }
+	    });
+	},
+	standbyScheduler: function() {
+		$.ajax({
+	        url : "[[@{/}]]job/standbyScheduler",
+	        data : {},
+	        type : "post",
+	        dataType : "json",
+	        error : function(data) {
+	        	errorHandle(data);
+	        },
+	        success : function(data) {
+	        	getSchedulerStatus();
+	        	msg(data);
+	        	refresh();
+	        }
+	    });
+	}
+};
+
+// 按钮事件
+$('.layui-btn').on('click', function(){
+    var type = $(this).data('type');
+    active[type] ? active[type].call(this) : '';
+});
+
+//监听行工具事件
+table.on('tool(config)', function(obj){
+	var row = obj.data;
+	if (obj.event === 'start') {
+		$.ajax({
+	        url : "[[@{/}]]job/start",
+	        data : {'id': row.id},
+	        type : "post",
+	        dataType : "json",
+	        error : function(data) {
+	        	errorHandle(data);
+	        },
+	        success : function(data) {
+	        	msg(data);
+	        	refresh();
+	        }
+	    });
+	} if (obj.event == 'pasue') {
+		$.ajax({
+	        url : "[[@{/}]]job/pasue",
+	        data : {'id': row.id},
+	        type : "post",
+	        dataType : "json",
+	        error : function(data) {
+	        	errorHandle(data);
+	        },
+	        success : function(data) {
+	        	msg(data);
+	        	refresh();
+	        }
+	    });
+	} if (obj.event == 'trigger') {
+		$.ajax({
+	        url : "[[@{/}]]job/trigger",
+	        data : {'id': row.id},
+	        type : "post",
+	        dataType : "json",
+	        error : function(data) {
+	        	errorHandle(data);
+	        },
+	        success : function(data) {
+	        	msg(data);
+	        	refresh();
+	        }
+	    });
+	} else if(obj.event === 'del') {
+		layer.confirm("确认删除吗？", {icon: 3, title:'提示'}, function(index) {
+			layer.close(index);
+			$.ajax({
+		        url : "[[@{/}]]job/delete",
+		        data : {'id': row.id},
+		        type : "post",
+		        dataType : "json",
+		        error : function(data) {
+		        	errorHandle(data);
+		        },
+		        success : function(data) {
+		        	refresh();
+		        }
+		    });
+		});
+    }
+});
+
+table.on('edit(config)', function(obj){
+    var value = obj.value;
+    if (isEmpty(value)) {
+    	layer.msg("不能为空", {icon: 2});
+    	refresh();
+    	return;
+    }
+    $.ajax({
+        url : "[[@{/}]]job/update",
+        data : {'id': obj.data.id, 'cronExpression' : value},
+        type : "post",
+        dataType : "json",
+        error : function(data) {
+        	errorHandle(data);
+        },
+        success : function(data) {
+        	msg(data);
+        	refresh();
+        }
+    });
+});
+
+// 获取定时器状态
+$(function(){getSchedulerStatus();});
+function getSchedulerStatus() {
+	$.ajax({
+        url : "[[@{/}]]job/isInStandbyMode",
+        data : {},
+        type : "post",
+        dataType : "json",
+        error : function(data) {
+        	errorHandle(data);
+        },
+        success : function(data) {
+        	if (!data.data) { // 启动状态
+        		$("button[data-type='startScheduler']").addClass("layui-hide");
+        		$("button[data-type='standbyScheduler']").removeClass("layui-hide");
+        		$("#schedulerStatus").html("<span class='text-green'>启动中</span>");
+        	} else { // 待机状态
+        		$("button[data-type='startScheduler']").removeClass("layui-hide");
+        		$("button[data-type='standbyScheduler']").addClass("layui-hide");
+        		$("#schedulerStatus").html("<span class='text-orange'>待机中</span>");
+        	}
+        }
+    });
+}
+</script>
+<script type="text/html" id="statusTemp">
+	{{#  if(d.status === 'NONE'){ }}
+    	<span class="text-purple">未启动</span>
+  	{{#  } else if(d.status === 'NORMAL') { }}
+		<span class="text-green">正常</span>
+  	{{#  } else if(d.status === 'PAUSED') { }}
+		<span class="text-orange">暂停</span>
+  	{{#  } else if(d.status === 'COMPLETE') { }}
+		<span class="text-aqua">完成</span>
+  	{{#  } else if(d.status === 'ERROR') { }}
+		<span class="text-red">异常</span>
+  	{{#  } else if(d.status === 'BLOCKED') { }}
+		<span class="text-maroon">锁定</span>
+  	{{#  } else { }}
+		<span class="text-gray">未知</span>
+	{{#  } }}
+</script>
+<script type="text/html" id="groupTemp">
+	{{#  if(d.jobGroup === 'default'){ }}
+    	默认
+  	{{#  } else if(d.jobGroup === 'system') { }}
+		系统
+  	{{#  } else { }}
+		未知
+	{{#  } }}
+</script>
+</html>

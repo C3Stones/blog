@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+    <link th:href="@{/layui/css/view.css}" rel="stylesheet" />
+    <script th:src="@{/layui/layui.all.js}"></script>
+    <script th:src="@{/jquery/jquery-2.1.4.min.js}"></script>
+    <script th:src="@{/jquery/jquery-form.js}"></script>
+    <script th:src="@{/layui/js/view.js}"></script>
+    <title></title>
+</head>
+<body class="layui-view-body">
+	<div class="layui-row">
+    	<div class="layui-card">
+        	<form class="layui-form layui-card-body layui-form-pane" method="post" th:action="@{/job/save}">
+        		<input type="hidden" name="status" value="NONE">
+				<div class="layui-form-item">
+					<div class="layui-inline mr0" style="width: 49.7%">
+						<label class="layui-form-label"><i>*</i>任务名称</label>
+						<div class="layui-input-block">
+							<input type="text" name="jobName" id="jobName" maxlength="30" lay-verify="required" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-inline mr0" style="width: 49.8%">
+						<label class="layui-form-label"><i>*</i>任务分组</label>
+						<div class="layui-input-block">
+							<select name="jobGroup">
+								<option value="default">默认</option>
+								<option value="system">系统</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label">任务描述</label>
+					<div class="layui-input-block">
+						<input type="text" name="remarks" maxlength="50" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+    				<label class="layui-form-label"><i>*</i>执行类</label>
+					<div class="layui-input-inline width-460">
+						<input type="text" name="beanClass" lay-verify="required" maxlength="200" class="layui-input">
+	    			</div>
+					<div class="layui-form-mid layui-word-aux">包名 + 类名，示例：com.c3stones.job.biz.TestJob</div>
+  				</div>
+				<div class="layui-form-item">
+    				<label class="layui-form-label">参数</label>
+					<div class="layui-input-inline width-460">
+						<input type="text" name="jobDataMap" placeholder="JSON数据格式" maxlength="1000" autocomplete="off" class="layui-input">
+	    			</div>
+					<div class="layui-form-mid layui-word-aux">示例：{"username":"zhangsan", "age":18}</div>
+  				</div>
+				<div class="layui-form-item">
+    				<label class="layui-form-label"><i>*</i>表达式</label>
+					<div class="layui-input-inline width-460">
+						<input type="text" name="cronExpression" placeholder="例如：0/5 * * * * ?" lay-verify="required" maxlength="200" class="layui-input">
+	    			</div>
+					<div class="layui-form-mid layui-word-aux"><a class="text-blue" href="https://cron.qqe2.com/" target="_blank">在线Cron表达式生成器</a></div>
+  				</div>
+				<div class="layui-form-item">
+	                <button type="submit" class="layui-btn" lay-submit lay-filter="*">提交</button>
+	                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+              	</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+var form = layui.form;
+var layer = layui.layer;
+
+form.render();
+
+// 提交表单
+form.on('submit(*)', function(data){
+	$(".layui-form").ajaxForm({
+		error: function(data){
+			errorHandle(data);
+		},
+		success: function(data) {
+			parent.location.reload();
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		}
+	});
+});
+</script>
+</html>

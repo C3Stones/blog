@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+    <link th:href="@{/layui/css/view.css}" rel="stylesheet" />
+    <script th:src="@{/layui/layui.all.js}"></script>
+    <script th:src="@{/jquery/jquery-2.1.4.min.js}"></script>
+    <script th:src="@{/jquery/jquery-form.js}"></script>
+    <script th:src="@{/layui/js/view.js}"></script>
+    <title></title>
+</head>
+<body class="layui-view-body">
+	<div class="layui-row">
+    	<div class="layui-card">
+        	<form class="layui-form layui-card-body layui-form-pane" method="post" th:action="@{/auth/save}">
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i>*</i>权限名称</label>
+					<div class="layui-input-block">
+						<input type="text" name="authName" lay-verify="required" maxlength="50" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<label class="layui-form-label"><i>*</i>权限标识</label>
+					<div class="layui-input-block">
+						<input type="text" name="permission" lay-verify="required" placeholder="例如：sys:user:edit" maxlength="200" class="layui-input">
+					</div>
+				</div>
+				<div class="layui-form-item">
+	                <button type="submit" class="layui-btn" lay-submit lay-filter="*">提交</button>
+	                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+              	</div>
+			</form>
+		</div>
+	</div>
+</body>
+<script>
+var form = layui.form;
+var layer = layui.layer;
+
+// 提交表单
+form.on('submit(*)', function(data){
+	$(".layui-form").ajaxForm({
+		error: function(data){
+			errorHandle(data);
+		},
+		success: function(data) {
+			parent.location.reload();
+			var index = parent.layer.getFrameIndex(window.name);
+			parent.layer.close(index);
+		}
+	});
+});
+</script>
+</html>

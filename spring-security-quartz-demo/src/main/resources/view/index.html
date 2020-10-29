@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>C3Stones</title>
+    <link th:href="@{/images/favicon.ico}" rel="icon">
+	<link th:href="@{/layui/css/layui.css}" rel="stylesheet" />
+	<link th:href="@{/layui/css/admin.css}" rel="stylesheet" />
+	<script th:src="@{/layui/layui.js}"></script>
+	<script th:src="@{/layui/js/index.js}" data-main="home"></script>
+</head>
+<body class="layui-layout-body">
+    <div class="layui-layout layui-layout-admin">
+        <div class="layui-header custom-header">
+            <ul class="layui-nav layui-layout-left">
+                <li class="layui-nav-item slide-sidebar" lay-unselect>
+                    <a href="javascript:;" class="icon-font"><i class="ai ai-menufold"></i></a>
+                </li>
+            </ul>
+            <ul class="layui-nav layui-layout-right">
+                <li class="layui-nav-item">
+                    <a href="javascript:;">[[${user?.nickname}]]</a>
+                    <dl class="layui-nav-child">
+                        <dd><a th:href="@{/logout}">退出</a></dd>
+                    </dl>
+                </li>
+            </ul>
+        </div>
+
+        <div class="layui-side custom-admin">
+            <div class="layui-side-scroll">
+                <div class="custom-logo">
+                    <img alt="" th:src="@{/images/logo.jpg}">
+                    <h1>C3Stones</h1>
+                </div>
+                <ul id="Nav" class="layui-nav layui-nav-tree">
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">
+                            <i class="layui-icon">&#xe68e;</i>
+                            <em>主页</em>
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd><a th:href="@{/view}">控制台</a></dd>
+                        </dl>
+                    </li>
+                    <li class="layui-nav-item">
+                        <a href="javascript:;">
+                            <i class="layui-icon">&#xe716;</i>
+                            <em>系统管理</em>
+                        </a>
+                        <dl class="layui-nav-child">
+                            <dd><a th:href="@{/user/list}">用户管理</a></dd>
+                        </dl>
+                        <dl class="layui-nav-child">
+                            <dd><a th:href="@{/role/list}">用户角色</a></dd>
+                        </dl>
+                        <dl class="layui-nav-child">
+                            <dd><a th:href="@{/auth/list}">角色权限</a></dd>
+                        </dl>
+                        <dl class="layui-nav-child">
+                            <dd><a th:href="@{/job/list}">任务调度</a></dd>
+                        </dl>
+                    </li>
+                </ul>
+
+            </div>
+        </div>
+
+        <div class="layui-body">
+             <div class="layui-tab app-container" lay-allowClose="true" lay-filter="tabs">
+                <ul id="appTabs" class="layui-tab-title custom-tab"></ul>
+                <div id="appTabPage" class="layui-tab-content"></div>
+            </div>
+        </div>
+
+        <div class="layui-footer">
+            <p>© 2020 - C3Stones Blog : <a href="https://www.cnblogs.com/cao-lei/" target="_blank">https://www.cnblogs.com/cao-lei/</a></p>
+        </div>
+        <div class="mobile-mask"></div>
+    </div>
+</body>
+</html>

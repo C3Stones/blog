@@ -1,0 +1,83 @@
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 1800s
+  
+spring:
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+  datasource:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/quartzdemo?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+      username: root
+      password: 123456
+  thymeleaf:
+    prefix: classpath:/view/
+    suffix: .html
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    # 生产环境设置true
+    cache: false
+  quartz:
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: clusteredScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: t_qrtz_
+            isClustered: false
+            clusterCheckinInterval: 10000
+            useProperties: false
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+    job-store-type: jdbc
+
+# Mybatis-plus配置
+mybatis-plus:
+   mapper-locations: classpath:mapper/*.xml
+   global-config:
+      db-config:
+         id-type: AUTO
+   configuration:
+      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 日志配置
+logging:
+  config: classpath:logback-spring.xml
+       
+# 信息安全
+security:
+  web:
+    excludes:
+      - /login
+      - /logout
+      - /images/**
+      - /jquery/**
+      - /layui/**
+  xss:
+    enable: true
+    excludes:
+      - /login
+      - /logout
+      - /images/*
+      - /jquery/*
+      - /layui/*
+  sql:
+    enable: true
+    excludes:
+      - /images/*
+      - /jquery/*
+      - /layui/*
+  csrf:
+    enable: true
+    excludes:
