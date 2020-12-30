@@ -1,0 +1,12 @@
+server:
+  port: 8080
+  
+spring:
+  thymeleaf:
+    prefix: classpath:/view/
+    suffix: .html
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    # 生产环境设置true
+    cache: false  

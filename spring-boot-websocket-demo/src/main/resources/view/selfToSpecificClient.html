@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>WebSocket - Self To Specific</title>
+</head>
+<body>
+	消息：<input id="message" type="text" /><br/>
+	Session Id：<input id="sessionId" type="text" /><br/>
+    <button onclick="sendMessage()">发送</button>
+    <button onclick="closeWebSocket()">关闭</button>
+    <hr/>
+    <div id="response"></div>
+</body>
+<script type="text/javascript">
+	var websocket = null;
+	
+	// 判断当前浏览器是否支持WebSocket
+	if ('WebSocket' in window) {
+	    websocket = new WebSocket("ws://localhost:8080/selfToSpecific");
+	} else {
+	    alert("当前浏览器不支持WebSocket");
+	}
+	
+	// 建立连接成功时的回调方法
+    websocket.onopen = function (event) {
+    	printMessage("green", "建立连接成功！！！");
+    }
+	
+	// 连接异常时的回调方法
+    websocket.onerror = function (event) {
+    	printMessage("red", "连接异常！！！");
+    };
+
+    // 客户端接收消息时的回调方法
+    websocket.onmessage = function (event) {
+    	printMessage("blue", event.data);
+    }
+
+    // 关闭连接时的回调方法
+    websocket.onclose = function() {
+    	printMessage("yellow", "关闭连接成功！！！");
+    }
+
+    // 监听窗口关闭事件，当窗口关闭时，主动关闭连接，防止连接未断开时关闭窗口，服务端抛出异常
+    window.onbeforeunload = function() {
+        websocket.close();
+    }
+    
+    // 发送消息
+    function sendMessage() {
+    	if (websocket.readyState != 1) {
+    		printMessage("red", "未建立连接或者连接已处于关闭状态！");
+    	} else {
+    		 var message = document.getElementById('message').value;
+    		 var sessionId = document.getElementById('sessionId').value;
+    		 
+    		 var obj = new Object();
+    		 obj.message = message;
+    		 obj.sessionId = sessionId;
+    	     websocket.send(JSON.stringify(obj));
+    	}
+    }
+    
+ 	// 关闭连接
+    function closeWebSocket() {
+        websocket.close();
+    }
+ 	
+  	// 打印消息
+    function printMessage(color, text) {
+        document.getElementById("response").innerHTML += "<font color='" + color +"'>" + text + "</font><br/>";
+    }
+</script>
+</html>
