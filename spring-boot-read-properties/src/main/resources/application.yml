@@ -1,0 +1,12 @@
+product:
+  name: Demo
+  author: C3Stones
+
+sys:
+  module:
+    - code: core
+      enable: true
+      version: 1
+    - code: common
+      enable: false
+      version: 2
