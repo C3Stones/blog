@@ -1,0 +1,26 @@
+DROP TABLE IF EXISTS `sys_log`;
+CREATE TABLE `sys_log` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT 'ID',
+  `log_type` varchar(50) NOT NULL COMMENT '日志类型',
+  `create_user_code` varchar(64) NOT NULL COMMENT '创建用户编码',
+  `create_user_name` varchar(100) NOT NULL COMMENT '创建用户名称',
+  `create_date` datetime NOT NULL COMMENT '创建时间',
+  `request_uri` varchar(500) DEFAULT NULL COMMENT '请求URI',
+  `request_method` varchar(10) DEFAULT NULL COMMENT '请求方式',
+  `request_params` text COMMENT '请求参数',
+  `request_ip` varchar(20) NOT NULL COMMENT '请求IP',
+  `server_address` varchar(50) NOT NULL COMMENT '请求服务器地址',
+  `is_exception` char(1) DEFAULT NULL COMMENT '是否异常',
+  `exception_info` text COMMENT '异常信息',
+  `start_time` datetime NOT NULL COMMENT '开始时间',
+  `end_time` datetime NOT NULL COMMENT '结束时间',
+  `execute_time` int DEFAULT NULL COMMENT '执行时间',
+  `user_agent` varchar(500) DEFAULT NULL COMMENT '用户代理',
+  `device_name` varchar(100) DEFAULT NULL COMMENT '操作系统',
+  `browser_name` varchar(100) DEFAULT NULL COMMENT '浏览器名称',
+  PRIMARY KEY (`id`) USING BTREE,
+  KEY `idx_sys_log_lt` (`log_type`) USING BTREE,
+  KEY `idx_sys_log_cub` (`create_user_code`) USING BTREE,
+  KEY `idx_sys_log_ie` (`is_exception`) USING BTREE,
+  KEY `idx_sys_log_cd` (`create_date`) USING BTREE
+) COMMENT='系统日志表';
