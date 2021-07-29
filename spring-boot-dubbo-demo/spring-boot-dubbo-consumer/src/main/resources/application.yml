@@ -1,0 +1,11 @@
+server:
+  port: 7002
+
+dubbo:
+  application:
+    name: dubbo-consumer
+  registry:
+    protocol: zookeeper
+    address: 127.0.0.1:2181
+  monitor:
+    protocol: register

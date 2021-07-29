@@ -1,0 +1,27 @@
+server:
+  port: 7001
+
+dubbo:
+  application:
+    name: dubbo-provider
+  registry:
+    protocol: zookeeper
+    address: 127.0.0.1:2181
+  monitor:
+    protocol: register
+    
+spring:
+  datasource:
+      driverClassName: com.mysql.cj.jdbc.Driver
+      url: jdbc:mysql://127.0.0.1:3306/dubbo-demo?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull
+      username: root
+      password: 123456
+      
+# Mybatis-plus配置
+mybatis-plus:
+   mapper-locations: classpath:mapper/*.xml
+   global-config:
+      db-config:
+         id-type: AUTO
+#   configuration:
+#      log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

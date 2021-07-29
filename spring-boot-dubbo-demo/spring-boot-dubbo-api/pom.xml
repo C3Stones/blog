@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.c3stones</groupId>
+	<artifactId>spring-boot-dubbo-api</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>spring-boot-dubbo-api</name>
+	<description>Spring Boot Dubbo Api</description>
+
+	<properties>
+		<java.version>1.8</java.version>
+		<mybatis-plus.version>3.3.1</mybatis-plus.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.baomidou</groupId>
+			<artifactId>mybatis-plus-boot-starter</artifactId>
+			<version>${mybatis-plus.version}</version>
+		</dependency>
+	</dependencies>
+
+</project>
