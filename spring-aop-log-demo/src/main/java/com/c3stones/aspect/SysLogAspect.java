@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.Executor;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -14,7 +15,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -48,7 +48,7 @@ public class SysLogAspect {
 	private ThreadLocal<SysLog> sysLogThreadLocal = new ThreadLocal<>();
 
 	@Autowired
-	private ThreadPoolTaskExecutor threadPoolTaskExecutor;
+	private Executor customThreadPoolTaskExecutor;
 
 	@Autowired
 	private SysLogService sysLogService;
@@ -110,7 +110,7 @@ public class SysLogAspect {
 			sysLog.setIsException(Global.YES);
 			sysLog.setExceptionInfo(r.getMsg());
 		}
-		threadPoolTaskExecutor.execute(new SaveLogThread(sysLog, sysLogService));
+		customThreadPoolTaskExecutor.execute(new SaveLogThread(sysLog, sysLogService));
 		sysLogThreadLocal.remove();
 
 		Runtime runtime = Runtime.getRuntime();
@@ -132,7 +132,7 @@ public class SysLogAspect {
 		sysLog.setExecuteTime(Long.valueOf(ChronoUnit.MINUTES.between(sysLog.getStartTime(), sysLog.getEndTime())));
 		sysLog.setIsException(Global.YES);
 		sysLog.setExceptionInfo(e.getMessage());
-		threadPoolTaskExecutor.execute(new SaveLogThread(sysLog, sysLogService));
+		customThreadPoolTaskExecutor.execute(new SaveLogThread(sysLog, sysLogService));
 		sysLogThreadLocal.remove();
 		
 		Runtime runtime = Runtime.getRuntime();
