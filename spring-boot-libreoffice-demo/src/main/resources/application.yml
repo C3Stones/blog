@@ -1,0 +1,35 @@
+server:
+  port: 8080
+
+spring:
+  thymeleaf:
+    prefix: classpath:/view/
+    suffix: .html
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+    cache: false
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+# 附件预览
+jodconverter:
+  local:
+    enabled: true
+#   # 设置LibreOffice目录
+    officeHome: D:\LibreOffice
+#   # CentOS 下安装 LibreOffice：
+#   # 1、安装：yum -y install libreoffice
+#   # 2、配置：officeHome: /usr/lib64/libreoffice
+#   # Linux 中文字体乱码解决：
+#   # 1、上传 C:\Windows\Fonts 下的字体到 /usr/share/fonts/windows 目录
+#   # 2、执行命令： chmod 644 /usr/share/fonts/windows/* && fc-cache -fv
+#   # 监听端口,开启多个LibreOffice进程，每个端口对应一个进程
+#   portNumbers: 8100,8101,8102
+    portNumbers: 2002
+#   # LibreOffice进程重启前的最大进程数
+    maxTasksPerProcess: 10
+#   # 任务在转换队列中的最大生存时间，默认30s
+    taskQueueTimeout: 30

@@ -1,0 +1,33 @@
+<html>
+<head>
+	<title>附件预览和下载</title>
+</head>
+<body>
+	<h5>支持附件类型为：.doc, .docx, .xls, .xlsx, .csv, .ppt, .pptx, .pdf, .txt, .xml, .md, .json, .gif, .jpg, .jpeg, .png, .ico, .bmp</h5>
+	<form id="fileForm" action="" method="post" enctype="multipart/form-data">
+		<i style="color: red">*</i> 上传附件：<input id="file" name="file" type="file" /><br/>
+	</form>
+	<button onclick="preview()">预览</button>
+</body>
+</html>
+<script>
+// 预览方法
+function preview() {
+	// 检查是否为空和大小限制
+	var file = document.getElementById('file').files[0];
+	if (!file) {
+		alert("附件不能为空");
+		return;
+	}
+	var fileSize = file.size;
+	if (fileSize > 50 * 1024 * 1024) {
+		alert("最大支持附件大小为 50MB");
+		return;
+	}
+	
+	// 提交表单
+	var fileForm = document.getElementById('fileForm');
+	fileForm.action = "[[@{/}]]file/preview";  
+	fileForm.submit();
+}
+</script>
