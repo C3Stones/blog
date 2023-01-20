@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/sql2dsl?useSSL=false&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+  elasticsearch:
+    uris: http://127.0.0.1:9200 #多个用,分开
+    # username: elastic
+    # password: elastic
+    connectionTimeout: 5s
+    socketTimeout: 30s
+
+# Mybatis-plus配置
+mybatis-plus:
+  configuration:
+    # 打印sql，生产建议关闭
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
