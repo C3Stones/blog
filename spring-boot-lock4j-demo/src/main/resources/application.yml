@@ -1,0 +1,12 @@
+spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+
+# Lock4j配置
+#lock4j:
+#  acquire-timeout: 3000 #等待时长。默认值3s，可不设置
+#  expire: 30000 #过期时间，防止死锁。默认值30s，可不设置
+#  primary-executor: com.baomidou.lock.executor.RedisTemplateLockExecutor #默认redisson>redisTemplate>zookeeper，可不设置
+#  lock-key-prefix: lock4j #锁key前缀。默认值lock4j，可不设置
