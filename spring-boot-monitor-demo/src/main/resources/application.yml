@@ -1,0 +1,13 @@
+# 预警配置
+monitor:
+  warn:
+    enabled: true
+    cpu:
+      stage1: 85
+      stage2: 95
+    memory:
+      stage1: 85
+      stage2: 95
+    disk:
+      stage1: 85
+      stage2: 95
