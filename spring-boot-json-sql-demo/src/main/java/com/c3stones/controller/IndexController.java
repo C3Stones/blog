@@ -18,7 +18,7 @@ public class IndexController {
      */
     @GetMapping(value = "index")
     public String index() {
-d        return "index";
+        return "index";
     }
 
 }
