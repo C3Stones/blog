@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JSON-SQL</title>
+    <script th:src="@{/jquery-2.2.4.min.js}"></script>
+    <script th:src="@{/jsonsql-0.1.js}" data-main="home"></script>
+</head>
+<body>
+<H2 style="color: red">注意：where条件必须放到括号中。只支持等于。</H2>
+<H3>请输入json数据:</H3>
+<textarea id="json" placeholder="请输入json数据" rows="10" cols="100"></textarea><br>
+<H3>请输入请输入SQL:</H3>
+<textarea id="sql" placeholder="请输入SQL" rows="5" cols="100"></textarea><br>
+<H3><button type="button" onclick="handleClick()" style="width: 200px;height: 40px">获取结果</button></H3>
+<textarea id="result" rows="10" cols="100"></textarea><br>
+</body>
+<script type="text/javascript">
+    $(function() {
+        $('#json').val("{\"data\":[" +
+            "{\"id\":1,\"name\":\"张三\",\"age\":25,\"sex\":\"男\",\"address\":\"陕西省西安市\",\"status\":true,\"createTime\":1672502400000,\"hobbies\":[\"看书\",\"听歌\"],\"luckyNumbers\":[7,21]}," +
+            "{\"id\":2,\"name\":\"李四\",\"age\":28,\"sex\":\"女\",\"address\":\"陕西省渭南市\",\"status\":true,\"createTime\":1680278400000,\"hobbies\":[\"逛街\",\"购物\"],\"luckyNumbers\":[]}," +
+            "{\"id\":3,\"name\":\"王五\",\"age\":30,\"sex\":\"男\",\"address\":\"北京市\",\"status\":false,\"createTime\":1682870400000,\"hobbies\":[\"看书\"],\"luckyNumbers\":[8,24]}" +
+            "]}");
+        $('#sql').val("select * from json.data where (name=='张三' || name=='李四') order by age DESC limit 2");
+    });
+    function handleClick() {
+        var json = eval("(" + $('#json').val() + ")");
+        var sql = $('#sql').val();
+        var result = jsonsql.query(sql, json);
+        $('#result').val(JSON.stringify(result));
+    }
+</script>
+</html>

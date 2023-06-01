@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.c3stones.user.mapper.UserMapper">
+
+    <update id="createTable">
+        CREATE TABLE IF NOT EXISTS `test_user`  (
+            `id` bigint NOT NULL,
+            `name` varchar(20),
+            `age` tinyint,
+            `sex` varchar(1),
+            `address` varchar(255),
+            `status` tinyint,
+            `createTime` datetime,
+            `hobbies` json,
+            `luckyNumbers` json,
+            PRIMARY KEY (`id`)
+        );
+    </update>
+
+    <delete id="dropTable">
+        DROP TABLE IF EXISTS `test_user`;
+    </delete>
+
+</mapper>
+    
