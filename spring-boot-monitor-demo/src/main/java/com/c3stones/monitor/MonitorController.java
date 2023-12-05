@@ -1,6 +1,8 @@
 package com.c3stones.monitor;
 
 import cn.hutool.core.date.LocalDateTimeUtil;
+import cn.hutool.core.lang.Opt;
+import cn.hutool.core.text.CharPool;
 import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
@@ -23,8 +25,8 @@ import java.io.File;
 import java.lang.management.*;
 import java.math.BigDecimal;
 import java.net.InetAddress;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -103,20 +105,31 @@ public class MonitorController {
     /**
      * 打印
      *
+     * @param cmd 指定参数。all-全部监控信息，xxx-单个监控信息，默认展示CPU/Memory/gc信息。
      * @return {@link String}
      */
     @GetMapping({"", "/print"})
-    public String print() {
-        return Stream.of(
-                Layout.of("Server Info", server()),
-                Layout.of("JVM", jvm()),
-                Layout.of("CPU", cpu()),
-                Layout.of("Memory", memory()),
-                Layout.of("Disk", disk()),
-                Layout.of("Heap/NonHeap", heap()),
-                Layout.of("Thread", thread()),
-                Layout.of("GC", gc())
-        ).map(Layout::toString).collect(Collectors.joining(StrUtil.LF));
+    public String print(String cmd) {
+        boolean isAll = StrUtil.equalsIgnoreCase("all", cmd);
+
+        Map<String, Function<Void, Object>> items = new LinkedHashMap<>();
+        items.put("Server Info", unused -> server());
+        items.put("JVM", unused -> jvm());
+        items.put("CPU", unused -> cpu());
+        items.put("Memory", unused -> memory());
+        items.put("Disk", unused -> disk());
+        items.put("Heap/NonHeap", unused -> heap());
+        items.put("Thread", unused -> thread());
+        items.put("GC", unused -> gc());
+
+        Stream<Layout> streams = items.entrySet().stream()
+                .filter(entry -> isAll ? Boolean.TRUE : StrUtil.containsAnyIgnoreCase(entry.getKey(),
+                        Opt.ofBlankAble(cmd).orElse("CPU&Memory&GC").split(Objects.toString(CharPool.AMP))))
+                .map(entry -> Layout.of(entry.getKey(), entry.getValue().apply(null)));
+
+        String tip = !isAll ? "Tip: Set parameters [cmd=all] will return more information."
+                + StrUtil.LF + StrUtil.LF : StrUtil.EMPTY;
+        return tip + streams.map(Layout::toString).collect(Collectors.joining(StrUtil.LF));
     }
 
     /**
@@ -250,12 +263,13 @@ public class MonitorController {
      * @return {@link Gc}
      */
     private Gc gc() {
-        long collectionCount = 0, collectionTime = 0;
-        for (GarbageCollectorMXBean garbageCollectorMXBean : ManagementFactory.getGarbageCollectorMXBeans()) {
-            collectionCount += garbageCollectorMXBean.getCollectionCount();
-            collectionTime += garbageCollectorMXBean.getCollectionTime();
-        }
-        return Gc.builder().collectionCount(collectionCount).collectionTime(collectionTime).build();
+        List<Gc.GcCollector> collectors = ManagementFactory.getGarbageCollectorMXBeans().stream().map(garbageCollectorMXBean -> Gc.GcCollector.builder()
+                        .name(garbageCollectorMXBean.getName())
+                        .count(garbageCollectorMXBean.getCollectionCount())
+                        .time(garbageCollectorMXBean.getCollectionTime())
+                        .build()).sorted(Comparator.comparing(Gc.GcCollector::getCount).reversed())
+                .collect(Collectors.toList());
+        return Gc.builder().collectors(collectors).build();
     }
 
 }
